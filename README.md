@@ -1,99 +1,33 @@
-# A Graph Deep Learning Framework for Unsupervised Edge Clustering of Socio-Demographic Mobility Patterns
-## 📜 Overview
-This research introduces a novel framework for analyzing complex socio-spatial dynamics by shifting the analytical focus from static geographic regions (**nodes**) to the dynamic mobility flows between them (**edges**). Traditional spatial analysis often overlooks the rich, relational context embedded in these flows. To address this gap, we propose a methodology to generate high-quality **edge embeddings** for origin-destination (O-D) flows, enabling the discovery of meaningful mobility pattern typologies through unsupervised clustering.
+# A Typology of School-Age Migration via Edge Representation Learning
 
-Our core methodology is an end-to-end deep learning pipeline:
+**Status:** Conceptual framework for a course-term project.
+**Last updated:** Sep 20, 2025
 
-1. A **Graph Neural Network (GNN)** is first employed to learn context-aware embeddings for all nodes (regions), capturing their socio-economic attributes and the broader network topology.
+## 1. Abstract
 
-2. A fusion model, typically a **Multi-Layer Perceptron (MLP)**, then composes these learned node embeddings with the multi-dimensional attributes of the edge itself to create a final, comprehensive edge embedding.
+This research proposes a novel framework to create a data-driven typology of school-age migration flows. Traditional migration studies often focus on volumes or individual characteristics, overlooking the rich, contextual nature of the movement itself. By leveraging Edge Representation Learning, this project aims to create vector representations of migration flows that encode the unique attributes of both origins and destinations, enabling a more nuanced understanding of the complex drivers behind educational migration.
 
-This entire architecture is trained end-to-end using a **contrastive learning** objective, which guides the model to produce a semantically rich embedding space without requiring labeled data. This project applies the framework to the specific problem of analyzing **school-age population concentration patterns**, aiming to uncover the hidden mobility corridors that shape urban educational landscapes.
+## 2. Theoretical Background
 
-## motivation
-In many urban areas, the concentration of the school-age population in specific "elite" school districts is a significant social and economic issue. Existing analyses, often based on static census data, fail to capture the dynamic **mobility patterns** underlying this phenomenon—such as cross-district commutes to prestigious schools or private academies.
+The analysis of movement as a distinct entity, rather than just an attribute of a location, has a long tradition in geographic thought. However, quantitative methods have struggled to capture this relational complexity. Recent advancements in graph representation learning, particularly methods that learn embeddings for edges (i.e., relationships) rather than just nodes, offer a powerful new approach. This project specifically draws upon the conceptual foundations of node2vec [1] and other graph embedding techniques to model the directed, heterogeneous nature of migration flows.
 
-This research moves beyond static analysis by modeling these movements as a graph. By clustering the edges (the flows themselves), we can identify distinct, meaningful patterns like:
+## 3. Methodology
 
-- Mass commutes from suburban residential areas to specific educational hubs.
+1.  **Graph Construction:** A heterogeneous graph will be constructed where nodes represent geographic districts with various attributes (e.g., educational infrastructure, housing prices, demographic data).
+2.  **Edge Feature Engineering:** Each migration flow (edge) will be represented as a **dyadic matrix**, capturing the interaction between the feature vectors of the origin and destination nodes. This allows for a rich representation of the relational dynamics (e.g., difference in housing prices, travel distance).
+3.  **Edge Embedding:** A state-of-the-art edge embedding algorithm will be employed to generate low-dimensional vector representations for each migration flow.
+4.  **Clustering & Interpretation:** Clustering algorithms (e.g., K-Means, HDBSCAN) will be applied to the edge embeddings to identify and interpret distinct migration typologies.
 
-- Inter-district flows driven by the reputation of certain private academies.
+## 4. Expected Contributions
 
-- Unique mobility patterns of different age groups (e.g., elementary vs. high school students).
+This project is expected to yield a rich, data-driven typology of migration, moving beyond simple volume mapping. Potential typologies to be identified include:
 
-Understanding these patterns provides a more nuanced, data-driven basis for policy-making in urban planning and education.
+* **'Upward Educational Mobility' flows:** Characterized by movement from areas with lower educational resources to those with significantly higher resources.
+* **'Suburban Relocation' flows:** Driven primarily by housing and neighborhood characteristics rather than purely educational factors.
+* **'Specialized Program' flows:** Smaller, long-distance flows directed towards specific, unique educational programs.
 
-## 🔬 Methodology
+This novel approach will provide a more granular and context-aware understanding of school-age migration, offering valuable insights for educational policy and urban planning.
 
-Our framework is designed to generate rich representations for edges and then cluster them in an unsupervised manner.
+## 5. References
 
-### 1. Graph Construction
-
-* **Nodes**: Geographic units (e.g., administrative districts) are treated as nodes. Each node has a feature vector containing socio-economic attributes (e.g., housing prices, school density, average income).
-* **Edges**: An edge represents an O-D flow between two nodes. Each edge has its own multi-dimensional feature vector, representing the characteristics of that specific flow (e.g., `[flow_of_elementary_students, flow_of_middle_school_students, ...]`).
-
-### 2. Edge Embedding Generation: A Two-Step Pipeline
-
-The core of our proposal is the generation of a powerful embedding for each edge ($e_{od}$) that captures the context of its endpoints and its own unique features.
-
-#### Step 1: Contextual Node Embedding with a GNN
-
-We first process the entire graph with a GNN (e.g., Graph Attention Network, GAT). This step produces context-aware embeddings ($z_o, z_d$) for the origin ($o$) and destination ($d$) nodes. These embeddings represent not only the node's own attributes but also its role and connectivity within the broader network.
-
-#### Step 2: Compositional Edge Embedding with a Fusion Model
-
-The final edge embedding ($z_e$) is generated by a fusion model (an MLP or an Attention mechanism) that combines the outputs from Step 1 with the edge's own features ($e_{od}$).
-
-> $z_e = \text{FusionModel}( [z_o, z_d, e_{od}] )$
-
-This process learns the complex, non-linear interactions between the origin's context, the destination's context, and the specific demographic profile of the flow.
-
-### 3. Unsupervised Learning via Contrastive Loss
-
-Since we lack ground-truth labels for edge clusters, the entire model (GNN + Fusion Model) is trained end-to-end using a **contrastive learning** objective. This approach teaches the model to produce a semantically meaningful embedding space.
-
-* **Positive Pairs**: We define pairs of edges that should have similar embeddings. A primary strategy is to use **structural similarity**: sequential edges, such as `A -> B` and `B -> C`, form a positive pair as they represent a continuous travel path. Other criteria can include shared origins/destinations or high similarity in edge attributes.
-* **Negative Pairs**: These are pairs of edges that are not expected to be similar, typically sampled randomly from the graph.
-* **Loss Function**: A contrastive loss function (e.g., InfoNCE) is used to minimize the distance between positive pairs while maximizing the distance between negative pairs in the embedding space. The loss is backpropagated through the entire architecture, training both the GNN and the fusion model simultaneously.
-
-### 4. Unsupervised Flow Clustering
-
-With high-quality embeddings for every flow, we apply standard unsupervised clustering algorithms (e.g., K-Means, DBSCAN) to the set of all edge embeddings. The resulting clusters represent distinct typologies of socio-demographic mobility.
-
-## 📊 Experimental Design & Baselines
-
-To validate the effectiveness of our proposed model, we will compare its clustering performance against a comprehensive set of baseline models. This ensures that the contributions of each component are rigorously evaluated.
-
-| Category                | Baseline Model                      | Rationale: Answers the question...                                          |
-| ----------------------- | ----------------------------------- | --------------------------------------------------------------------------- |
-| **Non-Graph** | K-Means on Concatenated Features    | "Is learning the graph's contextual structure truly necessary?"             |
-| **Traditional Graph** | Node2vec + MLP                      | "Is a modern GNN superior to traditional graph embedding methods?"          |
-| **SOTA Alternative** | Line Graph + GNN                    | "How does our compositional approach compare to an alternative SOTA paradigm for edge-level tasks?" |
-
-## 📚 Relation to Prior Work
-
-This research is positioned at the intersection of Graph Deep Learning and Urban Analytics. While the technical components (GNNs, compositional embeddings) exist, their application to this specific problem is novel.
-
-* **Distinction from Link Prediction**: Most edge-level research focuses on **Link Prediction** (predicting the existence of an edge). Our work, in contrast, focuses on **Edge Clustering** (categorizing existing edges), a fundamentally different, unsupervised task.
-* **Distinction from Chen et al. (2020)**: The influential LGNN paper focuses on **supervised node classification**. Our work differs fundamentally in three ways:
-    1.  **Goal**: Edge Clustering vs. Node Classification.
-    2.  **Learning Paradigm**: Unsupervised vs. Supervised.
-    3.  **Architecture**: A sequential GNN+MLP pipeline vs. a co-evolutionary architecture where node and edge states update each other iteratively.
-
-## 🌟 Contribution
-
-* **Methodological**: Proposes a novel, end-to-end framework for unsupervised edge clustering in complex spatial networks.
-* **Policy**: Provides a data-driven tool for policymakers to understand the dynamic mechanisms behind socio-spatial phenomena like school-age population concentration, enabling more targeted interventions.
-* **Academic**: Serves as a strong case study for applying advanced GeoAI techniques to solve real-world problems in social science and geography.
-
-## 🔧 Installation
-
-`(Instructions to be added)`
-
-## 🚀 Usage
-
-`(Code examples and usage instructions to be added)`
-
-## 📄 Citation
-
-`(Please cite our paper if you use this code in your research)`
+[1] Grover, A., & Leskovec, J. (2016). node2vec: Scalable Feature Learning for Networks. *Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining.*
